@@ -1,19 +1,12 @@
-﻿//using System.Collections.Generic;
-//using System.ComponentModel.DataAnnotations;
-//using System.ComponentModel.DataAnnotations.Schema;
-//using System.Data.Entity;
-//using System.Runtime.Remoting.Contexts;
-//using System.Xml.Serialization;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
+//using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Windows;
-using System.Windows.Documents;
-using System.Xml.Linq;
+//using System.Security.Cryptography;
+//using System.Windows;
+//using System.Windows.Documents;
+//using System.Xml.Linq;
 
 namespace WpfApp1
 {
@@ -76,9 +69,6 @@ namespace WpfApp1
             cmd.CommandText = sql;
             if (p != null)
                 cmd.Parameters.AddRange(p);
-
-            //SqlParameter nameParam = new SqlParameter("@name", name);
-            //command.Parameters.Add(nameParam);
 
             List<object[]> tab = new List<object[]>();
             using (var r = cmd.ExecuteReader())

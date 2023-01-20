@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
-//using System.Windows.Controls;
+using System.Windows.Controls;
 
 namespace WpfApp1
 {
@@ -38,6 +38,7 @@ namespace WpfApp1
         }
 
 
+        // insert data for testing
         private void initdb()
         {
             using (var db = new NPODB(scon))
@@ -46,13 +47,13 @@ namespace WpfApp1
  insert into tests (testdate, blockname, note) values (CONVERT(smalldatetime,'2021-07-01', 120), 'block3', 'xxxxxx');
 insert into tests (testdate, blockname, note) values (CONVERT(smalldatetime,'2019-11-12', 120), 'block4', 'yyyyyyy');
 ";
-//                db.DDL(sql);
+                db.DDL(sql);
 
                 sql = @"insert into parameters (testid, parametername, requiredvalue, measuredvalue) values (3, 'par1', 1, 1.01);
  insert into parameters (testid, parametername, requiredvalue, measuredvalue) values (2, 'par1', 2, 1.98);
 insert into parameters (testid, parametername, requiredvalue, measuredvalue) values (4, 'par1', 3, 2.6);
 ";
-//                db.DDL(sql);
+                db.DDL(sql);
             }
         }
 
@@ -63,17 +64,7 @@ insert into parameters (testid, parametername, requiredvalue, measuredvalue) val
                 var tab = db.Select("select testid, testdate, blockname, ISNULL(CAST(note as nvarchar(200)),'') from tests", null);
                 var t2 = tab.Select(o => new test() { TestId=(int)o[0], TestDate = (DateTime)o[1], BlockName = (string)o[2], Note = (string)o[3] }).ToList();
                 this.testTab.ItemsSource = t2;
-
-                var tab2 = db.Select("select * from parameters", null);
-                var t22 = tab2.Select(o => new parameter()
-                {
-                    ParameterId = (int)o[0],
-                    TestId = (int)o[1],
-                    ParameterName = (string)o[2],
-                    RequiredValue = (decimal)o[3],
-                    MeasuredValue = (decimal)o[4]
-                }).ToList();
-                this.propTab.ItemsSource = t22;
+                this.RefreshParamTab(t2[0].TestId);
             }
         }
 
@@ -87,23 +78,25 @@ insert into parameters (testid, parametername, requiredvalue, measuredvalue) val
             {
                 using (var db = new NPODB(scon))
                 {
+                    var trow = (test)this.testTab.SelectedItem;
                     var d = dlg.get_data();
                     var sql = @"insert into parameters (testid, parametername, requiredvalue, measuredvalue) values (@tid, @pname, @vr, @vm)";
-                    db.DDL(sql, d.TestId, d.ParameterName, d.RequiredValue, d.MeasuredValue, "tid", "pname", "vr", "vm");
-                    this.RefreshParamTab();    
+                    db.DDL(sql, trow.TestId, d.ParameterName, d.RequiredValue, d.MeasuredValue, "tid", "pname", "vr", "vm");
+                    this.RefreshParamTab(trow.TestId);    
                 }
             }
         }
 
         private void btnDel_Click(object sender, RoutedEventArgs e)
         {
+            var trow = (test)this.testTab.SelectedItem;
             var row = (parameter)this.propTab.SelectedItem;
 
             using (var db = new NPODB(scon))
             {
                 var sql = @"delete from parameters where parameterid=@pid";
                 db.DDL(sql, row.ParameterId, "pid");
-                this.RefreshParamTab();
+                this.RefreshParamTab(trow.TestId);
             }
         }
 
@@ -118,22 +111,30 @@ insert into parameters (testid, parametername, requiredvalue, measuredvalue) val
             {
                 using (var db = new NPODB(scon))
                 {
+                    var trow = (test)this.testTab.SelectedItem;
                     var d = dlg.get_data();
                     d.TestId = row.TestId;
                     d.ParameterId = row.ParameterId;
                     var sql = @"update parameters set testid=@tid, parametername=@pname, requiredvalue=@vr, measuredvalue=@vm where parameterid=@pid";
-                    db.DDL(sql, d.TestId, d.ParameterName, d.RequiredValue, d.MeasuredValue, d.ParameterId, "tid", "pname", "vr", "vm", "pid");
-                    this.RefreshParamTab();
+                    db.DDL(sql, trow.TestId, d.ParameterName, d.RequiredValue, d.MeasuredValue, d.ParameterId, "tid", "pname", "vr", "vm", "pid");
+                    this.RefreshParamTab(trow.TestId);
                 }
             }
 
         }
 
-        private void RefreshParamTab()
+        private void testTab_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            var row = (test)this.testTab.SelectedItem;
+            this.RefreshParamTab(row.TestId);
+        }
+
+        private void RefreshParamTab(int testid)
         {
             using (var db = new NPODB(scon))
             {
-                var tab = db.Select("select * from parameters", null);
+                SqlParameter q = new SqlParameter("tid", testid);
+                var tab = db.Select("select * from parameters where testid=@tid", new object[] { q });
                 var t2 = tab.Select(o => new parameter()
                 {
                     ParameterId = (int)o[0],
@@ -146,8 +147,5 @@ insert into parameters (testid, parametername, requiredvalue, measuredvalue) val
             }
         }
 
-        private void testTab_CurrentCellChanged(object sender, EventArgs e)
-        {
-        }
     }
 }

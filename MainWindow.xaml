@@ -8,10 +8,28 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="491" Width="857" Loaded="Window_Loaded">
     <Grid Height="449" VerticalAlignment="Top" Margin="10,10,10,0">
-        <DataGrid x:Name="propTab" Height="222" VerticalAlignment="Top" Margin="24,167,34,0" AutoGenerateColumns="True" IsTextSearchEnabled="True"/>
-        <Button x:Name="btnAdd" Content="Add" HorizontalAlignment="Left" Margin="654,407,0,0" VerticalAlignment="Top" Height="25" Width="43" Click="btnAdd_Click"/>
-        <Button x:Name="btnDel" Content="Del" HorizontalAlignment="Left" Margin="706,407,0,0" VerticalAlignment="Top" Height="25" Width="43" Click="btnDel_Click"/>
-        <Button x:Name="btnUpd" Content="Upd" HorizontalAlignment="Left" Margin="760,406,0,0" VerticalAlignment="Top" Height="25" Width="43" Click="btnUpd_Click"/>
-        <DataGrid x:Name="testTab" Height="116" Margin="24,21,34,0" VerticalAlignment="Top" IsReadOnly="True" IsSynchronizedWithCurrentItem="True" CurrentCellChanged="testTab_CurrentCellChanged" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <DataGrid x:Name="testTab" Grid.Column="0" Grid.Row="1" IsReadOnly="True" IsSynchronizedWithCurrentItem="True" SelectedCellsChanged="testTab_SelectedCellsChanged" >
+            <DataGrid.ColumnHeaderStyle>
+                <Style/>
+            </DataGrid.ColumnHeaderStyle>
+        </DataGrid>
+        <DataGrid x:Name="propTab"  Grid.Column="0" Grid.Row="3" IsReadOnly="True" AutoGenerateColumns="True" IsTextSearchEnabled="True" />
+
+        <Button x:Name="btnDel" Grid.Column="0" Grid.Row="4"  Content="Del" Height="25" Click="btnDel_Click" Margin="20,20,774,45" />
+        <Button x:Name="btnAdd" Grid.Column="0" Grid.Row="4" Content="Add" Height="25" Click="btnAdd_Click" Margin="708,20,86,45" />
+        <Button x:Name="btnUpd" Grid.Column="0" Grid.Row="4" Content="Upd" Height="25" Click="btnUpd_Click" Margin="774,20,20,45" />
+        <Label Content="Tests" Grid.Row="0"  Margin="4" FontWeight="Bold"/>
+        <Label Content="Parameters" Grid.Row="2" Margin="4" FontWeight="Bold"/>
     </Grid>
 </Window>
